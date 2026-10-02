@@ -21,7 +21,7 @@
     <properties>
         <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <springdoc.version>2.6.0</springdoc.version>
+        <springdoc.version>3.1.1</springdoc.version>
         <!-- 1.21.4+: docker-java speaks API >= 1.40. Docker Engine 29 (colima / Docker Desktop 29.x) rejects the
              1.32 default shipped with 1.21.3 ("client version 1.32 is too old"). -->
         <testcontainers.version>1.21.4</testcontainers.version>
