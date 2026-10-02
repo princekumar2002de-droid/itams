@@ -1,0 +1,15 @@
+# ==============================================================================
+#  Test profile — used by @SpringBootTest via @ActiveProfiles("test")
+#
+#  Fixed 64-char JWT secret so tests are deterministic. NEVER use this
+#  value anywhere else.
+# ==============================================================================
+
+jwt:
+  secret: test-secret-do-not-use-outside-junit-abcdefghijklmnop
+  access-token-ttl-minutes: 15
+  refresh-token-ttl-days:   7
+  issuer: itams-test
+
+bootstrap:
+  demo-password: changeme

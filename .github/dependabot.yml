@@ -1,0 +1,23 @@
+# Dependency update pull requests. Paths are relative to the repository root.
+version: 2
+updates:
+  - package-ecosystem: maven
+    directory: /backend
+    schedule: { interval: weekly }
+    open-pull-requests-limit: 5
+  - package-ecosystem: npm
+    directory: /frontend
+    schedule: { interval: weekly }
+    open-pull-requests-limit: 5
+    groups:
+      testing:
+        patterns: ["vitest", "@testing-library/*", "jsdom"]
+  - package-ecosystem: docker
+    directory: /backend
+    schedule: { interval: monthly }
+  - package-ecosystem: docker
+    directory: /frontend
+    schedule: { interval: monthly }
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: monthly }

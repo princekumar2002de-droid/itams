@@ -1,0 +1,218 @@
+%% ITAMS · Entity-Relationship Diagram
+%% Renders in GitHub / VS Code (Markdown Preview Mermaid Support) / mermaid.live
+%% Notation: Chen-style crow's-foot via Mermaid ER syntax
+%%   ||--o{ = one-to-many
+%%   ||--o| = one-to-zero-or-one
+%%   }o--o{ = many-to-many
+
+erDiagram
+
+    PERSON {
+        bigint id PK
+        varchar first_name
+        varchar last_name
+        varchar email "unique per deleted_at IS NULL"
+        varchar phone
+        boolean is_active
+        timestamptz deleted_at "soft-delete"
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    EMPLOYEE {
+        bigint id PK
+        bigint person_id FK "unique"
+        varchar employee_number "unique"
+        bigint department_id FK
+        varchar job_title
+        date hire_date
+        date end_date
+        text employment_status "ACTIVE | ON_LEAVE | LEFT"
+    }
+
+    DEPARTMENT {
+        bigint id PK
+        varchar code "unique"
+        varchar name
+        bigint parent_department_id FK "self-ref, nullable"
+        bigint manager_person_id FK "nullable"
+        timestamptz deleted_at
+    }
+
+    USER_ACCOUNT {
+        bigint id PK
+        bigint person_id FK "unique"
+        varchar username "unique"
+        varchar password_hash "BCrypt"
+        boolean enabled
+        timestamptz last_login_at
+    }
+
+    ROLE {
+        bigint id PK
+        varchar code "ADMIN | IT_MANAGER | EMPLOYEE"
+        varchar description
+    }
+
+    USER_ROLE {
+        bigint user_account_id PK,FK
+        bigint role_id PK,FK
+    }
+
+    REFRESH_TOKEN {
+        bigint id PK
+        bigint user_account_id FK
+        varchar token_hash "unique"
+        timestamptz issued_at
+        timestamptz expires_at
+        timestamptz revoked_at
+        varchar replaced_by_token_hash
+    }
+
+    ASSET_CATEGORY {
+        bigint id PK
+        varchar code "unique · LAPTOP, MONITOR, PHONE, ..."
+        varchar name
+        varchar description
+    }
+
+    ASSET_MODEL {
+        bigint id PK
+        bigint category_id FK
+        varchar manufacturer
+        varchar model_name
+        jsonb specs
+    }
+
+    ASSET {
+        bigint id PK
+        varchar asset_tag "unique"
+        bigint model_id FK
+        varchar serial_number "unique per model"
+        text status "IN_STOCK | ASSIGNED | UNDER_MAINTENANCE | RETIRED | LOST"
+        date purchase_date
+        numeric purchase_price "EUR"
+        date warranty_ends_on
+        text notes
+        timestamptz retired_at
+    }
+
+    ASSET_ASSIGNMENT {
+        bigint id PK
+        bigint asset_id FK
+        bigint assignee_person_id FK
+        bigint assigned_by_user_id FK
+        timestamptz assigned_at
+        date expected_return_on
+        timestamptz actual_return_at "NULL = still open"
+        bigint returned_by_user_id FK
+        text out_condition
+        text in_condition
+    }
+
+    SOFTWARE_PRODUCT {
+        bigint id PK
+        varchar vendor
+        varchar name
+        varchar version
+    }
+
+    SOFTWARE_LICENSE {
+        bigint id PK
+        bigint product_id FK
+        varchar license_reference
+        text license_type "PER_SEAT | PER_DEVICE | SITE | SUBSCRIPTION"
+        int seats_total
+        date purchase_date
+        date expires_on
+        numeric cost "EUR"
+        varchar procurement_ref
+    }
+
+    LICENSE_ASSIGNMENT {
+        bigint id PK
+        bigint license_id FK
+        bigint person_id FK "XOR with asset_id"
+        bigint asset_id FK "XOR with person_id"
+        timestamptz assigned_at
+        timestamptz released_at
+    }
+
+    MAINTENANCE_RECORD {
+        bigint id PK
+        bigint asset_id FK
+        date performed_on
+        bigint performed_by_user_id FK
+        varchar provider_name
+        text description
+        numeric cost "EUR"
+        date next_scheduled_on
+    }
+
+    TICKET {
+        bigint id PK
+        varchar ticket_number "unique · TCK-YYYY-nnnnnn"
+        varchar subject
+        text description
+        text priority "LOW | MEDIUM | HIGH | CRITICAL"
+        text status "OPEN | IN_PROGRESS | WAITING | RESOLVED | CLOSED"
+        bigint reporter_person_id FK
+        bigint related_asset_id FK
+        bigint assigned_to_user_id FK
+        timestamptz resolved_at
+        timestamptz closed_at
+    }
+
+    TICKET_COMMENT {
+        bigint id PK
+        bigint ticket_id FK
+        bigint author_user_id FK
+        text body
+        boolean is_internal
+        timestamptz created_at
+    }
+
+    AUDIT_LOG {
+        bigint id PK
+        timestamptz occurred_at
+        bigint actor_user_id FK
+        varchar entity_type
+        bigint entity_id
+        text action "CREATE|UPDATE|DELETE|ASSIGN|RETURN|STATUS_CHANGE|LOGIN|..."
+        jsonb changes
+        varchar request_id
+    }
+
+    %% ─────────── Relationships ───────────
+    PERSON        ||--o| EMPLOYEE            : "is an employee (0..1)"
+    PERSON        ||--o| USER_ACCOUNT        : "logs in as (0..1)"
+    DEPARTMENT    ||--o{ EMPLOYEE            : employs
+    DEPARTMENT    ||--o| PERSON              : "managed by"
+    DEPARTMENT    ||--o{ DEPARTMENT          : "parent of"
+
+    USER_ACCOUNT  ||--o{ USER_ROLE           : has
+    ROLE          ||--o{ USER_ROLE           : granted-in
+    USER_ACCOUNT  ||--o{ REFRESH_TOKEN       : issues
+
+    ASSET_CATEGORY||--o{ ASSET_MODEL         : classifies
+    ASSET_MODEL   ||--o{ ASSET               : "instantiated as"
+
+    ASSET         ||--o{ ASSET_ASSIGNMENT    : "history of"
+    PERSON        ||--o{ ASSET_ASSIGNMENT    : receives
+    USER_ACCOUNT  ||--o{ ASSET_ASSIGNMENT    : "assigned by / returned by"
+
+    ASSET         ||--o{ MAINTENANCE_RECORD  : "maintained via"
+    USER_ACCOUNT  ||--o{ MAINTENANCE_RECORD  : "performed by (internal)"
+
+    SOFTWARE_PRODUCT ||--o{ SOFTWARE_LICENSE : "sold as"
+    SOFTWARE_LICENSE ||--o{ LICENSE_ASSIGNMENT: allocated
+    PERSON           ||--o{ LICENSE_ASSIGNMENT: "granted to (XOR asset)"
+    ASSET            ||--o{ LICENSE_ASSIGNMENT: "installed on (XOR person)"
+
+    PERSON        ||--o{ TICKET              : reports
+    ASSET         ||--o{ TICKET              : "referenced in"
+    USER_ACCOUNT  ||--o{ TICKET              : "assigned to"
+    TICKET        ||--o{ TICKET_COMMENT      : has
+    USER_ACCOUNT  ||--o{ TICKET_COMMENT      : authors
+
+    USER_ACCOUNT  ||--o{ AUDIT_LOG           : performs

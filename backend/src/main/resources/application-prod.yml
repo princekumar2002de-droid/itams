@@ -1,0 +1,63 @@
+# ==============================================================================
+#  Production overrides. Activate with SPRING_PROFILES_ACTIVE=prod
+#  (the backend Dockerfile does this automatically).
+#
+#  Every value that MUST come from the environment is left blank / absent so
+#  the app fails fast with a clear message if it's missing, rather than silently
+#  falling back to a dev default.
+# ==============================================================================
+
+spring:
+  datasource:
+    # NO defaults — must be set in the compose file / deploy env.
+    url:      ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 20
+
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+# JWT_SECRET must be a fresh production secret. `openssl rand -base64 48` gives
+# 384 bits of randomness — well above the HS256 256-bit minimum. Do not use
+# the demo secret from docker/.env.example.
+jwt:
+  secret: ${JWT_SECRET}
+
+# Actuator is intentionally minimal in prod — health for orchestrators, info
+# for the version tag, nothing else. Health details are never shown so we don't
+# leak database/hostname info to unauthenticated probes.
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: never
+      show-components: never
+
+# Springdoc / Swagger are still available in prod for the internal audience
+# (internal users, on-call). If you don't want that, override with
+# springdoc.api-docs.enabled=false and springdoc.swagger-ui.enabled=false.
+
+logging:
+  level:
+    root: INFO
+    com.princekumar.itams: INFO
+    org.hibernate.SQL: WARN
+    org.springframework.security: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{40} - %msg%n"
+
+server:
+  # Consistent error shape in prod — never expose message details on 5xx.
+  error:
+    include-message: never
+    include-binding-errors: never
+    include-stacktrace: never
+    include-exception: false

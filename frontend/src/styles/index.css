@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Global tweaks ───────────────────────────────────────────────────────── */
+html, body, #root {
+  height: 100%;
+}
+
+/* Focus rings that don't scream */
+:where(button, a, input, select, textarea):focus-visible {
+  outline: 2px solid theme('colors.brand.600');
+  outline-offset: 2px;
+  border-radius: 4px;
+}

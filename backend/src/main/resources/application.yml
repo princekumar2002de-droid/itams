@@ -1,0 +1,85 @@
+# ==============================================================================
+#  ITAMS backend: default configuration
+# ==============================================================================
+
+spring:
+  application:
+    name: itams
+
+  datasource:
+    url:      ${DB_URL:jdbc:postgresql://localhost:5432/itams}
+    username: ${DB_USERNAME:itams}
+    password: ${DB_PASSWORD:itams}
+    hikari:
+      maximum-pool-size: 10
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+        format_sql: true
+    show-sql: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+    validate-on-migrate: true
+
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    include-message: always
+    include-binding-errors: always
+
+# ── JWT ─────────────────────────────────────────────────────────────────────
+# SECRET is REQUIRED — the app fails to start if it isn't set. That is
+# deliberate: a default secret in production would be a critical vulnerability.
+# For local dev, put JWT_SECRET (min 32 chars = 256 bits for HS256) into
+# docker/.env (which is git-ignored).
+jwt:
+  secret: ${JWT_SECRET:}
+  access-token-ttl-minutes: ${JWT_ACCESS_TTL_MINUTES:15}
+  refresh-token-ttl-days:   ${JWT_REFRESH_TTL_DAYS:7}
+  issuer:                   ${JWT_ISSUER:itams}
+
+# ── Bootstrap demo users (only used by DevBootstrap in non-prod profiles) ──
+bootstrap:
+  demo-password: ${BOOTSTRAP_DEMO_PASSWORD:changeme}
+
+# ── Auth rate limiting on POST /auth/login (in-memory sliding window) ──────
+# Higher than a realistic user needs, low enough to sting a credential stuffer.
+auth:
+  rate-limit:
+    max-attempts:  ${AUTH_RATE_LIMIT_MAX:10}
+    window-seconds: ${AUTH_RATE_LIMIT_WINDOW_SEC:60}
+
+# ── Actuator ─────────────────────────────────────────────────────────────────
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# ── OpenAPI / Swagger UI ─────────────────────────────────────────────────────
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: alpha
+    tags-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+
+logging:
+  level:
+    root: INFO
+    com.princekumar.itams: DEBUG
+    org.hibernate.SQL: INFO
+    org.springframework.security: INFO

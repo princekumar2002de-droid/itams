@@ -1,0 +1,117 @@
+# =============================================================================
+#  ITAMS · full stack
+#
+#  Bring up the whole app in one command:
+#     cd docker/
+#     cp .env.example .env      # then edit JWT_SECRET, POSTGRES_PASSWORD, ...
+#     docker compose up --build -d
+#     open http://localhost:3000
+#
+#  Stop:                         docker compose down
+#  Stop + wipe DB:               docker compose down -v
+#  Rebuild after a code change:  docker compose up --build -d backend  (or frontend)
+#
+#  Health check summary:
+#     - postgres uses pg_isready
+#     - backend  uses /actuator/health
+#     - frontend uses wget on /
+#     - each service that depends on another waits for it to be healthy.
+# =============================================================================
+
+name: itams
+
+services:
+
+  # ── Database ───────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: itams-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       ${POSTGRES_DB:-itams}
+      POSTGRES_USER:     ${POSTGRES_USER:-itams}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-itams}
+    ports:
+      - "${POSTGRES_HOST_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-itams} -d ${POSTGRES_DB:-itams}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # ── Spring Boot backend ────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: itams-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Spring datasource points at the postgres service (DNS name = "postgres")
+      DB_URL:      jdbc:postgresql://postgres:5432/${POSTGRES_DB:-itams}
+      DB_USERNAME: ${POSTGRES_USER:-itams}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-itams}
+      # SPRING_PROFILES_ACTIVE is set to "prod" inside the image; override to
+      # "default" here if you want the DevBootstrap seeder to run in the container.
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-default}
+      SERVER_PORT: "8080"
+      JWT_SECRET:                 ${JWT_SECRET}
+      JWT_ACCESS_TTL_MINUTES:     ${JWT_ACCESS_TTL_MINUTES:-15}
+      JWT_REFRESH_TTL_DAYS:       ${JWT_REFRESH_TTL_DAYS:-7}
+      JWT_ISSUER:                 ${JWT_ISSUER:-itams}
+      BOOTSTRAP_DEMO_PASSWORD:    ${BOOTSTRAP_DEMO_PASSWORD:-changeme}
+    ports:
+      - "${BACKEND_HOST_PORT:-8080}:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 3s
+      start_period: 45s
+      retries: 10
+
+  # ── React SPA served by nginx (also proxies /api → backend) ────────────────
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: itams-frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "${FRONTEND_HOST_PORT:-3000}:80"
+    healthcheck:
+      # 127.0.0.1, not localhost: on Alpine, localhost resolves to ::1 first, but nginx
+      # listens on IPv4 only, so the check was refused and the container showed "unhealthy".
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/ >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # ── pgAdmin (optional; docker compose --profile tools up) ──────────────────
+  pgadmin:
+    image: dpage/pgadmin4:8
+    container_name: itams-pgadmin
+    profiles: ["tools"]
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGADMIN_DEFAULT_EMAIL:      ${PGADMIN_EMAIL:-admin@itams.local}
+      PGADMIN_DEFAULT_PASSWORD:   ${PGADMIN_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "${PGADMIN_HOST_PORT:-5050}:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
+volumes:
+  postgres-data:
+  pgadmin-data:

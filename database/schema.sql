@@ -1,0 +1,27 @@
+-- =============================================================================
+--  ITAMS · Database schema pointer
+--
+--  This file is no longer the source of truth for the schema.
+--
+--  During Milestone 1 (design), this file held the planned DDL. In Milestone 2
+--  (implementation) it was copied into Flyway as V1__baseline.sql, and from
+--  that point on Flyway owned the schema — because Flyway is what actually
+--  runs against the database, is versioned per migration, and is validated on
+--  every startup (`spring.flyway.validate-on-migrate=true`).
+--
+--  Keeping two files describing the same DDL invited drift, so:
+--
+--   ✅ Source of truth for the current schema:
+--        backend/src/main/resources/db/migration/V1__baseline.sql
+--        backend/src/main/resources/db/migration/V2__seed_reference.sql
+--        backend/src/main/resources/db/migration/V3__seed_bootstrap_user.sql
+--
+--   📖 Human-readable narrative (entities, relationships, decisions):
+--        docs/database-design.md
+--
+--   🖼 ER diagram (Mermaid, renders in GitHub):
+--        docs/diagrams/er-diagram.mmd
+--
+--  This file stays here only so that older links (from earlier commits and
+--  from Milestone-1 doc drafts) still resolve.
+-- =============================================================================
