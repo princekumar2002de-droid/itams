@@ -5,7 +5,7 @@
 # =============================================================================
 
 # ---------- Stage 1: build ---------------------------------------------------
-FROM eclipse-temurin:21-jdk-alpine AS build
+FROM eclipse-temurin:25-jdk-alpine AS build
 
 # Maven is the only tool we need on top of the JDK.
 RUN apk add --no-cache maven
@@ -22,7 +22,7 @@ RUN mvn -B -q -DskipTests package \
  && cp target/*.jar /workspace/app.jar
 
 # ---------- Stage 2: runtime -------------------------------------------------
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:25-jre-alpine
 
 # Non-root user. Any exploit that gains code exec runs as `itams`, not root.
 RUN addgroup -S itams && adduser -S -G itams itams
