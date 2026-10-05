@@ -27,6 +27,15 @@ Open http://localhost:5173. The Vite dev server forwards `/api`, `/actuator` and
 
 Demo users: `admin`, `itmanager` and `employee`, password `changeme` (local development only).
 
+### Browser-only demo
+
+```bash
+npm run build:demo        # output in dist-demo/, served under /itams/
+npx vite preview --outDir dist-demo --base /itams/
+```
+
+With `VITE_DEMO=true`, `src/main.tsx` loads `src/demo/` before the app starts. It replaces `fetch` for `/api/v1/*` with an in-browser version of the API (`server.ts`) working on sample data (`db.ts`), stored in `sessionStorage`. The GitHub Pages workflow publishes this build. Without the flag, Vite leaves the demo code out of the bundle.
+
 ## Commands
 
 | Command | |

@@ -4,9 +4,11 @@ A web application for an IT operations team to manage the full lifecycle of comp
 
 I built it to practise the whole path from a business problem to running software: analyse the process, model it as a relational database, expose it through a secured REST API and give each role the right part of it in a web UI.
 
+**Live demo:** [princekumar2002de-droid.github.io/itams](https://princekumar2002de-droid.github.io/itams/): click *Admin*, *IT manager* or *Employee* on the login page. The demo runs entirely in your browser with sample data (see [Deployment](#13-deployment)); the real system is the Spring Boot + PostgreSQL stack described below.
+
 **Stack:** Java 21, Spring Boot 3.5, PostgreSQL 16, React 18 with TypeScript, Docker Compose
 
-**Status:** feature-complete. 72 backend unit tests, 43 integration tests against a real PostgreSQL database and 32 frontend tests pass. It is a portfolio project, not a production system; the known gaps are listed in [SECURITY.md](SECURITY.md).
+**Status:** feature-complete. 72 backend unit tests, 43 integration tests against a real PostgreSQL database and 37 frontend tests pass. It is a portfolio project, not a production system; the known gaps are listed in [SECURITY.md](SECURITY.md).
 
 > Part of my portfolio for the B.Sc. International Business Information Systems at HFU Furtwangen. The degree sits between business processes, information systems and software development, and this project is meant to show that combination in practice.
 
@@ -184,13 +186,15 @@ pgAdmin is optional: `docker compose --profile tools up`.
 
 The backend image runs with the `prod` profile: it refuses to start without its environment variables, hides actuator details and skips the demo data.
 
+**Browser-only demo (GitHub Pages).** So that the project can be tried without installing anything, `.github/workflows/demo.yml` publishes a second build of the frontend to GitHub Pages. In that build (`npm run build:demo`) the API calls are answered inside the browser by `frontend/src/demo/`, which holds the same sample company and applies the same role checks and business rules as the backend (covered by tests in `src/demo/server.test.ts`). Changes are kept for the browser tab only. It shows the user interface and the workflows; the backend, database, JWT handling and audit log are only in the real stack. The demo code is not part of the normal production bundle.
+
 ## 14. Testing
 
 | Command | What runs | Docker needed |
 |---|---|---|
 | `mvn test` | 72 backend unit tests | no |
 | `mvn verify` | unit tests + 43 integration tests on PostgreSQL 16 (Testcontainers) | yes |
-| `npm test` | 32 frontend tests (Vitest, Testing Library) | no |
+| `npm test` | 37 frontend tests (Vitest, Testing Library) | no |
 | `npm run build` | type check and production build | no |
 
 **Unit tests** cover the business rules without Spring: the asset and ticket state machines, ticket numbering and employee scoping, licence seat rules, maintenance rules, login without username enumeration, refresh-token rotation and reuse detection, the login rate limit and the audit aspect.

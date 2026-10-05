@@ -21,12 +21,11 @@ export function LoginPage() {
     return <Navigate to={from} replace />;
   }
 
-  async function onSubmit(e: FormEvent) {
-    e.preventDefault();
+  async function signIn(user: string, pass: string) {
     setError(null);
     setSubmitting(true);
     try {
-      await login(username.trim(), password);
+      await login(user.trim(), pass);
       const from = (location.state as { from?: string } | null)?.from ?? '/dashboard';
       navigate(from, { replace: true });
     } catch (err) {
@@ -34,6 +33,11 @@ export function LoginPage() {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  function onSubmit(e: FormEvent) {
+    e.preventDefault();
+    void signIn(username, password);
   }
 
   return (
@@ -84,6 +88,20 @@ export function LoginPage() {
             Sign in
           </Button>
         </form>
+
+        {import.meta.env.VITE_DEMO === 'true' && (
+          <div className="mt-6">
+            <div className="text-xs font-medium text-slate-700">Try it as</div>
+            <div className="mt-2 grid grid-cols-3 gap-2">
+              {[['admin', 'Admin'], ['itmanager', 'IT manager'], ['employee', 'Employee']].map(([user, label]) => (
+                <Button key={user} type="button" variant="secondary" size="sm" disabled={submitting}
+                  onClick={() => void signIn(user, 'changeme')}>
+                  {label}
+                </Button>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="mt-6 rounded-md bg-slate-50 p-3 text-xs text-slate-600">
           <div className="font-medium text-slate-700">Demo accounts</div>

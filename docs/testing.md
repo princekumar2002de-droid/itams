@@ -6,7 +6,7 @@
 |---|---|---|---|
 | Backend unit | JUnit 5, Mockito, AssertJ | 72 | Business rules and state machines, without Spring |
 | Backend integration | Spring Boot Test, MockMvc, Testcontainers (PostgreSQL 16) | 43 | The real application against a real database, through the full security chain |
-| Frontend | Vitest, Testing Library, jsdom | 32 | API client, auth context, route guards, pages and dialogs |
+| Frontend | Vitest, Testing Library, jsdom | 37 | API client, auth context, route guards, pages and dialogs |
 | Manual | Browser against the Docker Compose stack | per role | Complete workflows as ADMIN, IT_MANAGER and EMPLOYEE |
 
 ```bash
@@ -43,6 +43,7 @@ Each test class starts a PostgreSQL 16 container, runs the Flyway migrations and
 - `AuthProvider`: restoring the session, role checks, clearing cached data on logout
 - Route guard and sidebar: pages and menu entries per role
 - Ticket detail: only allowed status transitions are offered, employees get no workflow controls, people are shown by name
+- Demo backend (`src/demo/server.test.ts`): the browser-only demo enforces the same rules as the real API (401 without token, role checks, employee ticket scoping and hidden internal notes, state machines, seat limit)
 - Dialogs: raise ticket, record maintenance (internal or external performer), onboard employee (a failed second step does not create the person twice)
 
 To check that the tests can actually fail, I broke some of the behaviour on purpose (removing the single-flight refresh, the cache clear on logout, the role filter in the sidebar) and confirmed that the matching test went red.

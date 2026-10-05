@@ -16,6 +16,7 @@ HELP.md
 # --- Node / React ---------------------------------------------------------
 node_modules/
 dist/
+dist-demo/
 .vite/
 coverage/
 npm-debug.log*

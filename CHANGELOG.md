@@ -5,6 +5,7 @@ All notable changes to ITAMS. The format is based on [Keep a Changelog](https://
 ## [Unreleased]
 
 ### Added
+- Browser-only live demo on GitHub Pages: a demo build of the frontend answers API calls in the browser with sample data and the same role and business rules, with tests for those rules. Deployed by `.github/workflows/demo.yml`.
 - Screenshots in the README, taken from the Docker Compose stack with demo data.
 - Ticket and maintenance responses include the names of the assignee, comment authors and internal performer (`assignedToName`, `authorName`, `performedByName`), so the UI no longer shows "User #4".
 
