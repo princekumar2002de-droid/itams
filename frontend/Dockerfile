@@ -23,7 +23,7 @@ COPY src ./src
 RUN npm run build
 
 # ---------- Stage 2: nginx ---------------------------------------------------
-FROM nginx:1.27-alpine
+FROM nginx:1.31-alpine
 
 # Small runtime footprint; nginx already runs as an unprivileged user inside.
 COPY --from=build /workspace/dist /usr/share/nginx/html
