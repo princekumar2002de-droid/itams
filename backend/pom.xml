@@ -25,7 +25,7 @@
         <!-- 1.21.4+: docker-java speaks API >= 1.40. Docker Engine 29 (colima / Docker Desktop 29.x) rejects the
              1.32 default shipped with 1.21.3 ("client version 1.32 is too old"). -->
         <testcontainers.version>1.21.4</testcontainers.version>
-        <jjwt.version>0.12.6</jjwt.version>
+        <jjwt.version>0.13.0</jjwt.version>
     </properties>
 
     <dependencies>
