@@ -1,10 +1,18 @@
 # Dependency update pull requests. Paths are relative to the repository root.
+#
+# Major version bumps (Spring Boot 4, React 19, Tailwind 4, ...) change APIs and
+# need a planned migration, so they're ignored here and done by hand when I'm
+# ready. Minor and patch updates still come in as PRs. GitHub Actions are the
+# exception: their major versions mostly move to a newer Node runtime.
 version: 2
 updates:
   - package-ecosystem: maven
     directory: /backend
     schedule: { interval: weekly }
     open-pull-requests-limit: 5
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: npm
     directory: /frontend
     schedule: { interval: weekly }
@@ -12,12 +20,21 @@ updates:
     groups:
       testing:
         patterns: ["vitest", "@testing-library/*", "jsdom"]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: docker
     directory: /backend
     schedule: { interval: monthly }
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: docker
     directory: /frontend
     schedule: { interval: monthly }
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: github-actions
     directory: /
     schedule: { interval: monthly }
