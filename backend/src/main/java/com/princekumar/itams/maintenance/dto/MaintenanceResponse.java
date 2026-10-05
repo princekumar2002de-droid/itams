@@ -10,6 +10,7 @@ public record MaintenanceResponse(
     String assetTag,
     LocalDate performedOn,
     Long performedByUserId,
+    String performedByName,
     String providerName,
     String description,
     BigDecimal cost,

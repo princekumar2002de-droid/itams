@@ -12,9 +12,9 @@ vi.mock('../api/tickets', () => ({ ticketsApi: { get: vi.fn(), changeStatus: vi.
 const base: Ticket = {
   id: 5, ticketNumber: 'TCK-2026-000005', subject: 'VPN drops', description: 'Every hour',
   priority: 'MEDIUM', status: 'OPEN', reporterPersonId: 70, reporterName: 'Eve Employee',
-  relatedAssetId: null, relatedAssetTag: null, assignedToUserId: null, resolvedAt: null, closedAt: null,
+  relatedAssetId: null, relatedAssetTag: null, assignedToUserId: null, assignedToName: null, resolvedAt: null, closedAt: null,
   createdAt: '2026-10-01T08:00:00Z', updatedAt: '2026-10-01T08:00:00Z',
-  comments: [{ id: 1, authorUserId: 9, body: 'Looking into it', internal: false, createdAt: '2026-10-01T09:00:00Z' }],
+  comments: [{ id: 1, authorUserId: 9, authorName: 'Jonas Becker', body: 'Looking into it', internal: false, createdAt: '2026-10-01T09:00:00Z' }],
 };
 
 function show(t: Partial<Ticket>) {
@@ -56,5 +56,12 @@ describe('<TicketDetailPage>', () => {
     show({ status: 'OPEN' });
     await userEvent.click(await screen.findByRole('button', { name: /assign to me/i }));
     expect(ticketsApi.update).toHaveBeenCalledWith(5, { assignedToUserId: 42 });
+  });
+
+  it('shows people by name, not by user id', async () => {
+    asUser(['IT_MANAGER'], { userId: 42 });
+    show({ status: 'IN_PROGRESS', assignedToUserId: 9, assignedToName: 'Jonas Becker' });
+    expect(await screen.findAllByText('Jonas Becker')).toHaveLength(2);   // assignee + comment author
+    expect(screen.queryByText(/User #/)).not.toBeInTheDocument();
   });
 });

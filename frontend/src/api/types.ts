@@ -139,6 +139,7 @@ export interface MaintenanceRecord {
   assetTag: string;
   performedOn: string;
   performedByUserId: number | null;
+  performedByName: string | null;
   providerName: string | null;
   description: string;
   cost: string | null;
@@ -152,6 +153,7 @@ export interface MaintenanceRecord {
 export interface TicketComment {
   id: number;
   authorUserId: number;
+  authorName: string | null;
   body: string;
   internal: boolean;
   createdAt: string;
@@ -169,6 +171,7 @@ export interface Ticket {
   relatedAssetId: number | null;
   relatedAssetTag: string | null;
   assignedToUserId: number | null;
+  assignedToName: string | null;
   resolvedAt: string | null;
   closedAt: string | null;
   createdAt: string;

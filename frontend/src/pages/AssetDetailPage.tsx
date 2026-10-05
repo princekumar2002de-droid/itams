@@ -205,7 +205,7 @@ export function AssetDetailPage() {
                   <div>
                     <div className="text-slate-900">{m.description}</div>
                     <div className="mt-0.5 text-xs text-slate-500">
-                      {fmtDate(m.performedOn)} · {m.providerName ?? `internal (user #${m.performedByUserId})`}
+                      {fmtDate(m.performedOn)} · {m.providerName ?? `${m.performedByName ?? `user #${m.performedByUserId}`} (internal)`}
                       {m.nextScheduledOn && <> · next due {fmtDate(m.nextScheduledOn)}</>}
                     </div>
                   </div>

@@ -4,9 +4,9 @@ A web application for an IT operations team to manage the full lifecycle of comp
 
 I built it to practise the whole path from a business problem to running software: analyse the process, model it as a relational database, expose it through a secured REST API and give each role the right part of it in a web UI.
 
-**Stack:** Java 21, Spring Boot 3.3, PostgreSQL 16, React 18 with TypeScript, Docker Compose
+**Stack:** Java 21, Spring Boot 3.5, PostgreSQL 16, React 18 with TypeScript, Docker Compose
 
-**Status:** feature-complete. 70 backend unit tests, 42 integration tests against a real PostgreSQL database and 31 frontend tests pass. It is a portfolio project, not a production system; the known gaps are listed in [SECURITY.md](SECURITY.md).
+**Status:** feature-complete. 72 backend unit tests, 43 integration tests against a real PostgreSQL database and 32 frontend tests pass. It is a portfolio project, not a production system; the known gaps are listed in [SECURITY.md](SECURITY.md).
 
 > Part of my portfolio for the B.Sc. International Business Information Systems at HFU Furtwangen. The degree sits between business processes, information systems and software development, and this project is meant to show that combination in practice.
 
@@ -83,7 +83,7 @@ The UI only shows actions a role is allowed to perform, but the backend checks e
 
 ```
    ┌───────────────────────┐        ┌──────────────────────────┐
-   │  React SPA (nginx)    │  HTTP  │  Spring Boot 3.3         │
+   │  React SPA (nginx)    │  HTTP  │  Spring Boot 3.5         │
    │  Vite · Tailwind ·    │───────▶│  REST API /api/v1/*      │
    │  TanStack Query       │◀───────│  JWT filter, @PreAuthorize│
    └───────────────────────┘  JSON  └────────────┬─────────────┘
@@ -110,7 +110,7 @@ More detail: [docs/architecture.md](docs/architecture.md)
 |---|---|---|
 | Frontend | React 18, TypeScript 5, Vite 5, Tailwind 3 | Typed, fast build, no CSS-in-JS |
 | Server state | TanStack Query 5 | Caching and refetching without hand-written effects |
-| Backend | Java 21, Spring Boot 3.3, Spring Data JPA, Spring Security | LTS Java and the standard stack in German enterprise IT |
+| Backend | Java 21, Spring Boot 3.5, Spring Data JPA, Spring Security | LTS Java and the standard stack in German enterprise IT |
 | Auth | jjwt 0.12, BCrypt | Standard algorithms; the hash prefix allows a later switch to Argon2 |
 | Database | PostgreSQL 16 | Constraints, row locks, `jsonb` |
 | Migrations | Flyway 10 | Versioned SQL, no hidden schema changes |
@@ -188,9 +188,9 @@ The backend image runs with the `prod` profile: it refuses to start without its 
 
 | Command | What runs | Docker needed |
 |---|---|---|
-| `mvn test` | 70 backend unit tests | no |
-| `mvn verify` | unit tests + 42 integration tests on PostgreSQL 16 (Testcontainers) | yes |
-| `npm test` | 31 frontend tests (Vitest, Testing Library) | no |
+| `mvn test` | 72 backend unit tests | no |
+| `mvn verify` | unit tests + 43 integration tests on PostgreSQL 16 (Testcontainers) | yes |
+| `npm test` | 32 frontend tests (Vitest, Testing Library) | no |
 | `npm run build` | type check and production build | no |
 
 **Unit tests** cover the business rules without Spring: the asset and ticket state machines, ticket numbering and employee scoping, licence seat rules, maintenance rules, login without username enumeration, refresh-token rotation and reuse detection, the login rate limit and the audit aspect.
@@ -203,7 +203,25 @@ Getting the integration tests to run against a real database found several bugs 
 
 ## 15. Screenshots
 
-Screenshots are in [docs/screenshots](docs/screenshots/).
+Taken from the Docker Compose stack with demo data (a fictional company with 12 employees, 18 assets, 4 licences and 8 tickets).
+
+**Dashboard (ADMIN):** KPIs and breakdowns from one API call.
+
+![Dashboard](docs/screenshots/01-dashboard.png)
+
+**Asset detail:** the laptop was returned with a broken hinge, repaired under warranty and handed to the next employee. Both assignments and the repair stay in the history.
+
+![Asset detail](docs/screenshots/03-asset-detail.png)
+
+**Ticket as IT_MANAGER:** only the allowed next statuses are offered, and the yellow internal note is never sent to the employee who raised the ticket.
+
+![Ticket detail](docs/screenshots/06-ticket-detail.png)
+
+**The same system as EMPLOYEE:** a shorter menu, and only their own tickets.
+
+![Employee view](docs/screenshots/07-employee-view.png)
+
+More in [docs/screenshots](docs/screenshots/): asset list with filters, the new-asset form, licence seats, departments and the Swagger UI.
 
 ## 16. Installation
 

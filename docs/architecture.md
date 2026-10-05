@@ -29,7 +29,7 @@ ITAMS has no integrations with other systems. Three roles use one application.
 └───────────────────────────┬──────────────────────────────────┘
                             │
 ┌───────────────────────────▼──────────────────────────────────┐
-│ Spring Boot 3.3 on Java 21: REST, Spring Security + JWT,     │
+│ Spring Boot 3.5 on Java 21: REST, Spring Security + JWT,     │
 │ Spring Data JPA, Bean Validation, Flyway, springdoc          │
 └───────────────────────────┬──────────────────────────────────┘
                             │ JDBC
@@ -173,7 +173,7 @@ Each service has a health check, and each one waits for the previous one to be h
 | Decision | Chosen | Alternatives | Reason |
 |---|---|---|---|
 | Language | Java 21 | Kotlin | Java is what most German enterprise teams use; 21 is the current LTS with records and pattern matching |
-| Framework | Spring Boot 3.3 | Quarkus, Micronaut | The most common choice in German enterprise IT and the one covered in my studies |
+| Framework | Spring Boot 3.5 | Quarkus, Micronaut | The most common choice in German enterprise IT and the one covered in my studies |
 | Migrations | Flyway | Liquibase | Plain SQL files are easier to review than XML changelogs |
 | Frontend build | Vite | Create React App, Next.js | CRA is no longer maintained; Next.js adds server rendering this app doesn't need |
 | Styling | Tailwind CSS | CSS Modules, styled-components | Fast to work with, consistent, no runtime cost |

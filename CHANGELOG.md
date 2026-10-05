@@ -2,6 +2,21 @@
 
 All notable changes to ITAMS. The format is based on [Keep a Changelog](https://keepachangelog.com/). Versions follow the project milestones.
 
+## [Unreleased]
+
+### Added
+- Screenshots in the README, taken from the Docker Compose stack with demo data.
+- Ticket and maintenance responses include the names of the assignee, comment authors and internal performer (`assignedToName`, `authorName`, `performedByName`), so the UI no longer shows "User #4".
+
+### Fixed
+- Reloading `/assets` or opening `/assets/1` directly in the Docker setup failed: Vite's build folder was also called `assets`, so nginx answered with a redirect to port 80 or a 404. Build files now go to `static/`.
+- The frontend CI job failed on Node 20 because the Vitest config passed `--no-experimental-webstorage` unconditionally. The flag is now only passed where Node supports it.
+
+### Changed
+- CI and the frontend Docker image build with Node 22 instead of Node 20 (end of life).
+- Dependabot no longer opens pull requests for major versions; those upgrades are planned separately.
+- Dependencies updated through Dependabot, including Spring Boot 3.5.16, springdoc 2.9.1, jjwt 0.13.0 and nginx 1.31.
+
 ## [1.0.0] – 2026-10-02
 
 ### Added

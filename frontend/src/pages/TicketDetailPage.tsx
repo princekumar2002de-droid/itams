@@ -54,7 +54,7 @@ export function TicketDetailPage() {
   if (ticket.isError) return <><PageHeader title="Ticket" /><ErrorState error={ticket.error} /></>;
   if (!ticket.data) return null;
   const t = ticket.data;
-  const assignee = t.assignedToUserId == null ? 'Unassigned' : t.assignedToUserId === userId ? 'You' : `User #${t.assignedToUserId}`;
+  const assignee = t.assignedToUserId == null ? 'Unassigned' : t.assignedToUserId === userId ? 'You' : t.assignedToName ?? `User #${t.assignedToUserId}`;
 
   function submitComment(e: FormEvent) { e.preventDefault(); if (comment.trim()) addComment.mutate(); }
 
@@ -81,7 +81,7 @@ export function TicketDetailPage() {
                   {t.comments.map(c => (
                     <li key={c.id} className={c.internal ? 'rounded-md border border-amber-200 bg-amber-50 p-3' : 'rounded-md border border-slate-200 p-3'}>
                       <div className="flex items-center gap-2 text-xs text-slate-500">
-                        <span className="font-medium text-slate-700">{c.authorUserId === userId ? 'You' : `User #${c.authorUserId}`}</span>
+                        <span className="font-medium text-slate-700">{c.authorUserId === userId ? 'You' : c.authorName ?? `User #${c.authorUserId}`}</span>
                         <span>{fmtDateTime(c.createdAt)}</span>
                         {c.internal && <Badge tone="amber">Internal</Badge>}
                       </div>

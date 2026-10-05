@@ -18,6 +18,7 @@ public record TicketResponse(
     Long relatedAssetId,
     String relatedAssetTag,
     Long assignedToUserId,
+    String assignedToName,
     OffsetDateTime resolvedAt,
     OffsetDateTime closedAt,
     OffsetDateTime createdAt,

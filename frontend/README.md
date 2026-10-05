@@ -16,7 +16,7 @@ The app runs on http://localhost:3000. nginx serves the built frontend and forwa
 
 ### Local development
 
-Needs Node 20 or newer and a backend on http://localhost:8080. For another backend URL, copy `.env.example` to `.env.local` and set `VITE_BACKEND_URL`.
+Needs Node 22 or newer and a backend on http://localhost:8080. For another backend URL, copy `.env.example` to `.env.local` and set `VITE_BACKEND_URL`.
 
 ```bash
 npm install
@@ -82,4 +82,4 @@ src/
 
 ## Production build
 
-The `Dockerfile` builds with Node 20 and serves `dist/` with `nginx:1.27-alpine`. `nginx.conf` handles client-side routing, proxies the API, caches hashed assets for 30 days and includes `security-headers.conf` (CSP, `nosniff`, frame and referrer policies).
+The `Dockerfile` builds with Node 22 and serves `dist/` with `nginx:1.31-alpine`. `nginx.conf` handles client-side routing, proxies the API, caches hashed assets for 30 days and includes `security-headers.conf` (CSP, `nosniff`, frame and referrer policies).

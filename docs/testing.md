@@ -4,9 +4,9 @@
 
 | Level | Tools | Count | What it covers |
 |---|---|---|---|
-| Backend unit | JUnit 5, Mockito, AssertJ | 70 | Business rules and state machines, without Spring |
-| Backend integration | Spring Boot Test, MockMvc, Testcontainers (PostgreSQL 16) | 42 | The real application against a real database, through the full security chain |
-| Frontend | Vitest, Testing Library, jsdom | 31 | API client, auth context, route guards, pages and dialogs |
+| Backend unit | JUnit 5, Mockito, AssertJ | 72 | Business rules and state machines, without Spring |
+| Backend integration | Spring Boot Test, MockMvc, Testcontainers (PostgreSQL 16) | 43 | The real application against a real database, through the full security chain |
+| Frontend | Vitest, Testing Library, jsdom | 32 | API client, auth context, route guards, pages and dialogs |
 | Manual | Browser against the Docker Compose stack | per role | Complete workflows as ADMIN, IT_MANAGER and EMPLOYEE |
 
 ```bash
@@ -35,13 +35,14 @@ Each test class starts a PostgreSQL 16 container, runs the Flyway migrations and
 - `AssetAssignmentFlowIT`: assign, return and retire an asset; the maintenance cycle (return into maintenance, assignment blocked, maintenance finished, back in stock)
 - `AuthControllerIT`: login, refresh rotation, reuse of an old refresh token revoking the newer one, other sessions surviving, logout with an expired access token, `/me`
 - `AuthorizationIT`: 18 role × endpoint cases, expecting 401 for anonymous calls and 403 for wrong roles
+- `TicketNamesIT`: ticket responses carry the assignee's and each comment author's name
 
 ## Frontend tests
 
 - API client: bearer header, refresh on 401 followed by a retry, a single refresh for parallel requests, clearing the session when the refresh fails, mapping error bodies
 - `AuthProvider`: restoring the session, role checks, clearing cached data on logout
 - Route guard and sidebar: pages and menu entries per role
-- Ticket detail: only allowed status transitions are offered, employees get no workflow controls
+- Ticket detail: only allowed status transitions are offered, employees get no workflow controls, people are shown by name
 - Dialogs: raise ticket, record maintenance (internal or external performer), onboard employee (a failed second step does not create the person twice)
 
 To check that the tests can actually fail, I broke some of the behaviour on purpose (removing the single-flight refresh, the cache clear on logout, the role filter in the sidebar) and confirmed that the matching test went red.
@@ -59,9 +60,11 @@ Running the integration tests against a real database, and testing every role by
 | Logout failed after the access token expired | The endpoint required authentication | Logout is authorised by the refresh token only |
 | A repaired asset could never go back to stock | The domain method existed but no endpoint called it | New `maintenance-complete` endpoint |
 | A second user in the same tab briefly saw the first user's data | The frontend cache was not cleared on logout (the API correctly returned 404) | Clear the cache on login, logout and session expiry |
+| Reloading `/assets` or `/assets/1` in the Docker setup failed (redirect to port 80, then 404) | Vite's default build folder is also called `assets`, so nginx treated the app route as a directory. Clicking through the app never hit it, only a reload or a shared link | Build files go to `static/`; nginx no longer looks for directories. Found by the screenshot script, which opens every page by URL |
+| Tickets and maintenance records showed "User #4" instead of a name | Those tables store only the user id and the API returned only that | The API resolves the names in one query per response |
 
 ## Environment notes
 
 - Docker Engine 29 rejects the API version used by Testcontainers 1.21.3; 1.21.4 or newer is required.
 - With colima on macOS, set `DOCKER_HOST=unix://$HOME/.colima/default/docker.sock` and `TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock` before `mvn verify`.
-- Node 25 ships its own experimental `localStorage`, which hides the jsdom one; the Vitest config starts workers with `--no-experimental-webstorage`.
+- Node 25 ships its own experimental `localStorage`, which hides the jsdom one; the Vitest config starts workers with `--no-experimental-webstorage`, but only on Node versions that know the flag (Node 20 refuses to start with it).

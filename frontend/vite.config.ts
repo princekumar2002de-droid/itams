@@ -20,6 +20,9 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       outDir: 'dist',
+      // Not the default "assets": /assets is also an app route, and nginx would
+      // treat a reload of /assets or /assets/1 as a request for the build folder.
+      assetsDir: 'static',
       sourcemap: true,
     },
   };

@@ -1,6 +1,6 @@
 # ITAMS backend
 
-Spring Boot 3.3, Java 21, PostgreSQL 16, Flyway, Spring Security with JWT, Testcontainers.
+Spring Boot 3.5, Java 21, PostgreSQL 16, Flyway, Spring Security with JWT, Testcontainers.
 
 ## Getting started
 
@@ -127,8 +127,8 @@ More in [SECURITY.md](../SECURITY.md).
 ## Tests
 
 ```bash
-mvn test      # 70 unit tests, no Docker needed
-mvn verify    # plus 42 integration tests on PostgreSQL 16 via Testcontainers
+mvn test      # 72 unit tests, no Docker needed
+mvn verify    # plus 43 integration tests on PostgreSQL 16 via Testcontainers
 ```
 
 What the tests cover is described in [docs/testing.md](../docs/testing.md).

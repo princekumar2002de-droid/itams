@@ -75,7 +75,7 @@ export function MaintenancePage() {
                       <td className="px-4 py-2.5">
                         {m.providerName
                           ? <span className="text-slate-700">{m.providerName} <Badge tone="slate" className="ml-1">External</Badge></span>
-                          : <span className="text-slate-700">User #{m.performedByUserId} <Badge tone="blue" className="ml-1">Internal</Badge></span>
+                          : <span className="text-slate-700">{m.performedByName ?? `User #${m.performedByUserId}`} <Badge tone="blue" className="ml-1">Internal</Badge></span>
                         }
                       </td>
                       <td className="px-4 py-2.5 text-slate-700 max-w-md truncate" title={m.description}>{m.description}</td>
